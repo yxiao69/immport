@@ -1,0 +1,124 @@
+---
+title: "elisa processor"
+output: html_notebook
+---
+
+
+```{r}
+library(ImmuneSpaceR)
+library(tidyr)
+library(dplyr)
+```
+
+Here are some studies from which we want to extract the fcs_analyzed_result information. Note that not every study will have this information so the code should ideally check for NULL responses. This just populates the list / dictionary with the data.
+
+
+## define parameter 
+```{r}
+
+
+key='elisa'
+out='elisa.out'
+col1='analyted' #group by col1
+col2='value_reported' #the value take median
+
+
+```
+
+```{r}
+path <- "~/Downloads/"
+# names <- c("SDY80","SDY180","SDY269","SDY312")
+sumdat=read.csv("/Users/xiaoyi/Documents/2019 spring/data mining/Copy of studies_by_data_types.csv")
+names <- as.vector(sumdat$study)
+flist <- list()
+
+for (ii in 1:length(names)) {
+  tmp <- CreateConnection(names[ii])
+  flist[[ii]] <- tmp$getDataset(key)
+}
+```
+
+Now, we can write out the files. We could do it as part of the above loop but I separate it here in case the connectivity to the ImmuneSpaceR site is slow
+
+```{r}
+mainDir <- "~/Downloads"
+subDir <- out
+
+dir.create(file.path(mainDir, subDir))
+setwd(file.path(mainDir, subDir))
+
+for (ii in 1:length(flist)) {
+ # Write out the files
+  
+  outname <- paste(names[ii],key,".tsv",sep="_")
+#  fullpath <- paste0(path,outname,sep="")
+  if (nrow(flist[[ii]]) == 0) {
+    str <- paste(outname,"does not have any rows to write",sep=" ")
+    print(str)
+  } else {
+     write_tsv(flist[[ii]],path=outname)
+  }
+}
+```
+
+This will write out the data matrix files which summarize the population_cell_number in terms of the observation_ID and population_definition_reported.
+
+```{r}
+setwd(file.path(mainDir, subDir))
+
+files <- list.files(pattern=paste0("*",key,"*"))
+
+for (ii in 1:length(files)) {
+  fcs <- read_tsv(files[ii])
+  ids <- sapply(strsplit(fcs$`participant_id`,"\\."),`[`,1)
+  observation_ID <- gsub(" ","",paste(ids,format(fcs$`study_time_collected`,nsmall=1),sep="_"))
+   
+# All we need is the first 10 columns from the data frame
+   
+   fcs.mat <- cbind(observation_ID,fcs)
+   fcs.mat$observation_ID <- as.character(fcs.mat$observation_ID)
+   fcs.mat$`Participant ID` <- ids 
+   data.matrix <- fcs.mat %>% 
+     group_by(UQ(as.name(col1)),observation_ID) %>%#`population_definition_reported`
+     summarize(med=median(UQ(as.name(col2)))) %>% #`population_cell_number`
+     spread(observation_ID,med) 
+   
+    fname <- paste(strsplit(files[ii],"_")[[1]][1],"fcs_data_matrix.tsv",sep="_")
+    write_tsv(data.matrix,fname)
+}
+```
+
+Next create the Annotation file. We limit the number of columns we need here. We then remove any duplicates since this is simply an annotation file. No data summarization is required for this step. 
+
+```{r}
+###need edit 
+setwd(file.path(mainDir, subDir))
+files <- list.files(pattern=paste0("*",key,"*"))
+#
+for (ii in 1:length(files)) {
+  fcs <- read_tsv(files[ii])
+  ids <- sapply(strsplit(fcs$`participant_id`,"\\."),`[`,1)
+  observation_ID <- gsub(" ","",paste(ids,format(fcs$`study_time_collected`,nsmall=1),sep="_"))
+   
+# All we need is the first 10 columns from the data frame
+   
+  
+   
+   fcs.tmp <- cbind(observation_ID,fcs)
+   fcs.tmp$observation_ID <- as.character(fcs.tmp$observation_ID)
+   fcs.tmp$`Participant ID` <- ids 
+
+      fcs.2 <- fcs.tmp[,1:8]
+      
+# Are there duplicates ?
+      sum(duplicated(fcs.2))
+
+# Get rid of duplicated rows (except the first occurrence thereof)
+    fcs.3 <- fcs.2[!duplicated(fcs.2),]
+   
+    fname <- paste(strsplit(files[ii],"_")[[1]][1],key,"annotation.tsv",sep="_")
+    write_tsv(fcs.3,fname)
+}
+```
+
+
