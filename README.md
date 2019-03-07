@@ -18,5 +18,8 @@ Tidy up each dataset by study name
 ## ispace_query.r 
 Create matrix on study name and dataset , summarize on what data set are in each study
 
-## biosample_processor 
+## biosample_processor.r 
 Connect to sql database and pull biosample.txt for each study 
+
+## exp_matrix_fetch.r
+Fetch all gene expression matrix under each study 
