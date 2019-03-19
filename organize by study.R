@@ -1,9 +1,11 @@
 #organize  folder into study 
 library(ImmuneSpaceR)
 mainDir <- "~/Downloads"
-sumdat=read.csv("/Users/xiaoyi/Documents/2019 spring/data mining/Copy of studies_by_data_types.csv")
+
+
+sumdat=read_tsv("/Users/xiaoyi/Documents/2019spring/data mining/studies_by_data_types.tsv")
 studys <- as.vector(sumdat$study)
-names<-colnames(sumdat)[-1]
+names<-colnames(sumdat)[-c(1,7)]
 for ( i in 1:length(studys)){
   for(j in 1:length(names)){
 subDir <- paste0(names[j],'.out')
