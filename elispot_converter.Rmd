@@ -19,7 +19,7 @@ Here are some studies from which we want to extract the fcs_analyzed_result info
 
 key='elispot'
 out='elispot.out'
-col1='analyted' #group by col1
+col1='analyte' #group by col1
 col2='spot_number_reported' #the value take median
 
 
@@ -28,7 +28,7 @@ col2='spot_number_reported' #the value take median
 ```{r}
 path <- "~/Downloads/"
 # names <- c("SDY80","SDY180","SDY269","SDY312")
-sumdat=read.csv("/Users/xiaoyi/Documents/2019 spring/data mining/Copy of studies_by_data_types.csv")
+sumdat=read_tsv("/Users/xiaoyi/Documents/2019spring/data mining/studies_by_data_types.tsv")
 names <- as.vector(sumdat$study)
 flist <- list()
 

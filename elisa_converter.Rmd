@@ -8,6 +8,7 @@ output: html_notebook
 library(ImmuneSpaceR)
 library(tidyr)
 library(dplyr)
+library(readr)
 ```
 
 Here are some studies from which we want to extract the fcs_analyzed_result information. Note that not every study will have this information so the code should ideally check for NULL responses. This just populates the list / dictionary with the data.
@@ -19,7 +20,7 @@ Here are some studies from which we want to extract the fcs_analyzed_result info
 
 key='elisa'
 out='elisa.out'
-col1='analyted' #group by col1
+col1='analyte' #group by col1
 col2='value_reported' #the value take median
 
 
@@ -28,7 +29,7 @@ col2='value_reported' #the value take median
 ```{r}
 path <- "~/Downloads/"
 # names <- c("SDY80","SDY180","SDY269","SDY312")
-sumdat=read.csv("/Users/xiaoyi/Documents/2019 spring/data mining/Copy of studies_by_data_types.csv")
+sumdat=read_tsv("/Users/xiaoyi/Documents/2019spring/data mining/studies_by_data_types.tsv")
 names <- as.vector(sumdat$study)
 flist <- list()
 
@@ -72,12 +73,13 @@ for (ii in 1:length(files)) {
   fcs <- read_tsv(files[ii])
   ids <- sapply(strsplit(fcs$`participant_id`,"\\."),`[`,1)
   observation_ID <- gsub(" ","",paste(ids,format(fcs$`study_time_collected`,nsmall=1),sep="_"))
-   
+
 # All we need is the first 10 columns from the data frame
    
-   fcs.mat <- cbind(observation_ID,fcs)
-   fcs.mat$observation_ID <- as.character(fcs.mat$observation_ID)
-   fcs.mat$`Participant ID` <- ids 
+   fcs.mat <- data.frame(observation_ID=as.character(observation_ID),fcs)
+  #fcs.mat$observation_ID<- as.character(fcs.mat$observation_ID)
+   fcs.mat$`Participant ID` <- ids
+   
    data.matrix <- fcs.mat %>% 
      group_by(UQ(as.name(col1)),observation_ID) %>%#`population_definition_reported`
      summarize(med=median(UQ(as.name(col2)))) %>% #`population_cell_number`
