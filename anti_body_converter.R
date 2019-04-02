@@ -137,12 +137,12 @@ antibody_fetch <- function(study="SDY80",type="neut_ab_titer") {
 }
 
 
-sumdat=read_tsv("/Users/xiaoyi/Documents/2019spring/data mining/studies_by_data_types.tsv")
-studys <- as.vector(sumdat$study)
-dir.create("/Users/xiaoyi/Downloads/hai.out")
-setwd("/Users/xiaoyi/Downloads/hai.out")
+#sumdat=read_tsv("/Users/xiaoyi/Documents/2019spring/data mining/studies_by_data_types.tsv")
+#studys <- as.vector(sumdat$study)
+#dir.create("/Users/xiaoyi/Downloads/hai.out")
+#setwd("/Users/xiaoyi/Downloads/hai.out")
 
-sapply(studys,function(x) antibody_fetch(x,type="hai"))
-dir.create("/Users/xiaoyi/Downloads/neut_ab_titer.out")
-setwd('/Users/xiaoyi/Downloads/neut_ab_titer.out')
-sapply(studys,function(x) antibody_fetch(x,type="neut_ab_titer"))
+#sapply(studys,function(x) antibody_fetch(x,type="hai"))
+#dir.create("/Users/xiaoyi/Downloads/neut_ab_titer.out")
+#setwd('/Users/xiaoyi/Downloads/neut_ab_titer.out')
+#sapply(studys,function(x) antibody_fetch(x,type="neut_ab_titer"))

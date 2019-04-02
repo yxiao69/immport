@@ -27,7 +27,7 @@ col2='population_cell_number' #the value take median
 
 ```{r}
 path <- "~/Downloads/"
-# names <- c("SDY80","SDY180","SDY269","SDY312")
+names <- c("SDY80","SDY180","SDY269","SDY312")
 sumdat=read_tsv("/Users/xiaoyi/Documents/2019spring/data mining/studies_by_data_types.tsv")
 names <- as.vector(sumdat$study)
 flist <- list()
